@@ -43,7 +43,7 @@ export default function CustomNavbar() {
     >
       <Container>
         <Navbar.Brand href="/">
-          <div className="d-flex align-items-center gap-2">
+          <div className="d-flex align-items-center gap-1">
             <div>
               <img
                 src="/logo.png"
@@ -53,7 +53,7 @@ export default function CustomNavbar() {
             </div>
 
             <div>
-              <p className="mb-0 text-lge fw-bold md:flex hidden text-yellow-200!">
+              <p className="mb-0 text-lg fw-bold md:flex hidden text-yellow-200!">
                 Bharatha Vidyalaya Matriculation Higher Secondary School
               </p>
             </div>
