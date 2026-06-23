@@ -5,12 +5,12 @@ import CountUp from "react-countup";
 export default function Achievements() {
   const stats = [
     {
-      number: 1500,
+      number: 650,
       suffix: "+",
       title: "Students",
     },
     {
-      number: 50,
+      number: 20,
       suffix: "+",
       title: "Qualified Teachers",
     },

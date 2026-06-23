@@ -7,6 +7,8 @@ export default function GalleryPage() {
   const [images, setImages] = useState([]);
   const [selectedCategory, setSelectedCategory] =
     useState("All");
+  const [selectedIndex, setSelectedIndex] =
+    useState(null);
 
   useEffect(() => {
     fetchGallery();
@@ -24,6 +26,8 @@ export default function GalleryPage() {
   };
 
   const getImageUrl = (path) => {
+    if (!path) return "";
+
     const { data } = supabase.storage
       .from("gallery")
       .getPublicUrl(path);
@@ -48,11 +52,63 @@ export default function GalleryPage() {
             item.category === selectedCategory
         );
 
+  const openImage = (index) => {
+    setSelectedIndex(index);
+  };
+
+  const closeImage = () => {
+    setSelectedIndex(null);
+  };
+
+  const nextImage = () => {
+    setSelectedIndex((prev) =>
+      prev === filteredImages.length - 1
+        ? 0
+        : prev + 1
+    );
+  };
+
+  const prevImage = () => {
+    setSelectedIndex((prev) =>
+      prev === 0
+        ? filteredImages.length - 1
+        : prev - 1
+    );
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (selectedIndex === null) return;
+
+      if (e.key === "Escape")
+        closeImage();
+
+      if (e.key === "ArrowRight")
+        nextImage();
+
+      if (e.key === "ArrowLeft")
+        prevImage();
+    };
+
+    window.addEventListener(
+      "keydown",
+      handleKeyDown
+    );
+
+    return () =>
+      window.removeEventListener(
+        "keydown",
+        handleKeyDown
+      );
+  }, [selectedIndex, filteredImages]);
+
   return (
-    <section className="py-20 md:pt-26 bg-gradient-to-b from-white via-yellow-50/30 to-white">
+    <section className="py-20 md:pt-28 bg-gradient-to-b from-white via-yellow-50/30 to-white">
+
       <div className="container-custom">
 
         {/* Heading */}
+
         <div className="text-center mb-12">
 
           <span
@@ -96,14 +152,16 @@ export default function GalleryPage() {
               mx-auto
             "
           >
-            Explore our campus life, celebrations,
-            achievements, sports activities and
+            Explore our campus life,
+            celebrations, achievements,
+            sports activities and
             memorable school events.
           </p>
 
         </div>
 
-        {/* Filter Buttons */}
+        {/* Category Filter */}
+
         <div
           className="
             flex
@@ -151,31 +209,33 @@ export default function GalleryPage() {
         </div>
 
         {/* Gallery Grid */}
+
         <div
           className="
             grid
-            grid-cols-1
-            sm:grid-cols-2
-            lg:grid-cols-3
-            xl:grid-cols-4
-            gap-8
+            grid-cols-2
+            md:grid-cols-3
+            lg:grid-cols-4
+            xl:grid-cols-6
+            gap-4
           "
         >
-          {filteredImages.map((item) => (
-            <div
-              key={item.id}
-              className="
-                group
-                bg-white
-                rounded-3xl
-                overflow-hidden
-                shadow-lg
-                hover:shadow-2xl
-                transition-all
-                duration-500
-              "
-            >
-              <div className="overflow-hidden">
+          {filteredImages.map(
+            (item, index) => (
+              <div
+                key={item.id}
+                onClick={() =>
+                  openImage(index)
+                }
+                className="
+                  group
+                  overflow-hidden
+                  rounded-xl
+                  cursor-pointer
+                  shadow-md
+                  bg-white
+                "
+              >
                 <img
                   src={getImageUrl(
                     item.storage_path
@@ -183,56 +243,144 @@ export default function GalleryPage() {
                   alt={item.title}
                   className="
                     w-full
-                    h-64
+                    h-48
                     object-cover
                     group-hover:scale-110
                     transition-transform
-                    duration-700
+                    duration-500
                   "
                 />
               </div>
-
-              <div className="p-5">
-
-                <span
-                  className="
-                    text-xs
-                    px-3
-                    py-1
-                    rounded-full
-                    bg-yellow-100
-                    text-yellow-700
-                  "
-                >
-                  {item.category}
-                </span>
-
-                <h3
-                  className="
-                    mt-3
-                    text-lg
-                    font-bold
-                    text-slate-800
-                  "
-                >
-                  {item.title}
-                </h3>
-
-              </div>
-            </div>
-          ))}
+            )
+          )}
         </div>
 
         {/* Empty State */}
+
         {filteredImages.length === 0 && (
           <div className="text-center py-20">
             <p className="text-gray-500">
-              No images found in this category.
+              No images found in this
+              category.
             </p>
           </div>
         )}
 
       </div>
+
+      {/* Fullscreen Lightbox */}
+
+      {selectedIndex !== null && (
+        <div
+          className="
+            fixed
+            inset-0
+            bg-black/95
+            z-[9999]
+            flex
+            items-center
+            justify-center
+          "
+        >
+          {/* Close */}
+
+          <button
+            onClick={closeImage}
+            className="
+              absolute
+              top-4
+              right-6
+              text-white
+              text-5xl
+              z-20
+            "
+          >
+            ×
+          </button>
+
+          {/* Previous */}
+
+          <button
+            onClick={prevImage}
+            className="
+              absolute
+              left-4
+              md:left-8
+              text-white
+              text-5xl
+              z-20
+            "
+          >
+            ❮
+          </button>
+
+          {/* Current Image */}
+
+          <img
+            src={getImageUrl(
+              filteredImages[selectedIndex]
+                .storage_path
+            )}
+            alt={
+              filteredImages[
+                selectedIndex
+              ].title
+            }
+            className="
+              max-w-[90vw]
+              max-h-[85vh]
+              object-contain
+            "
+          />
+
+          {/* Next */}
+
+          <button
+            onClick={nextImage}
+            className="
+              absolute
+              right-4
+              md:right-8
+              text-white
+              text-5xl
+              z-20
+            "
+          >
+            ❯
+          </button>
+
+          {/* Caption */}
+
+          <div
+            className="
+              absolute
+              bottom-6
+              left-0
+              right-0
+              text-center
+              text-white
+              px-4
+            "
+          >
+            <h3 className="text-xl font-bold">
+              {
+                filteredImages[
+                  selectedIndex
+                ].title
+              }
+            </h3>
+
+            <p className="text-gray-300">
+              {
+                filteredImages[
+                  selectedIndex
+                ].category
+              }
+            </p>
+          </div>
+        </div>
+      )}
+
     </section>
   );
 }

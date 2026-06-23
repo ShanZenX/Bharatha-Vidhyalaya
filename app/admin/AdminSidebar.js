@@ -10,6 +10,7 @@ import {
   FaImages,
   FaSignOutAlt,
   FaSchool,
+  FaTrophy,
 } from "react-icons/fa";
 
 export default function AdminSidebar() {
@@ -31,6 +32,11 @@ export default function AdminSidebar() {
       href: "/admin/gallery",
       icon: <FaImages />,
     },
+    {
+      name: "Toppers",
+      href: "/admin/toppers",
+      icon: <FaTrophy />,
+    },
   ];
 
   const handleLogout = async () => {
@@ -44,7 +50,7 @@ export default function AdminSidebar() {
       w-72
       bg-slate-950
       text-white
-      max-h-screen
+      min-h-screen
       shadow-xl
       flex
       flex-col
@@ -52,12 +58,9 @@ export default function AdminSidebar() {
     >
       {/* School Header */}
 
-     
-
       {/* Navigation */}
 
       <nav className="flex-1 p-4 flex flex-col justify-center">
-
         <p className="text-xs uppercase tracking-wider text-slate-500 mb-4 px-3">
           Main Menu
         </p>
@@ -85,23 +88,16 @@ export default function AdminSidebar() {
               }
             `}
           >
-            <span className="text-lg">
-              {item.icon}
-            </span>
+            <span className="text-lg">{item.icon}</span>
 
-            <span className=" ">
-              {item.name}
-            </span>
-
+            <span className=" ">{item.name}</span>
           </Link>
         ))}
-
       </nav>
 
       {/* Footer */}
 
       <div className="p-4 border-t border-slate-800">
-
         <button
           onClick={handleLogout}
           className="
@@ -121,9 +117,7 @@ export default function AdminSidebar() {
           <FaSignOutAlt />
           Logout
         </button>
-
       </div>
-
     </aside>
   );
 }

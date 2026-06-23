@@ -36,7 +36,6 @@ export default function AdminLayout({
     }
 
     setUserEmail(user.email);
-
     setLoading(false);
   };
 
@@ -44,12 +43,12 @@ export default function AdminLayout({
     return (
       <div
         className="
-        flex
-        justify-center
-        items-center
-        min-h-screen
-        text-xl
-        font-semibold
+          flex
+          justify-center
+          items-center
+          min-h-screen
+          text-xl
+          font-semibold
         "
       >
         Loading Dashboard...
@@ -58,29 +57,43 @@ export default function AdminLayout({
   }
 
   return (
-    <div className="flex bg-slate-100">
+    <div className="h-screen overflow-hidden bg-slate-100">
 
-      {/* Desktop Sidebar */}
-
-      <AdminSidebar />
+      {/* Desktop Fixed Sidebar */}
+      <div
+        className="
+          hidden
+          md:block
+          fixed
+          left-0
+          top-0
+          h-screen
+          w-72
+          z-50
+        "
+      >
+        <AdminSidebar />
+      </div>
 
       {/* Mobile Sidebar */}
-
       {sidebarOpen && (
         <div
           className="
-          fixed
-          inset-0
-          z-50
-          bg-black/50
-          md:hidden
+            fixed
+            inset-0
+            z-50
+            bg-black/50
+            md:hidden
           "
           onClick={() =>
             setSidebarOpen(false)
           }
         >
           <div
-            className="w-72"
+            className="
+              w-72
+              h-screen
+            "
             onClick={(e) =>
               e.stopPropagation()
             }
@@ -90,26 +103,30 @@ export default function AdminLayout({
         </div>
       )}
 
-      {/* Main Content */}
+      {/* Right Content Area */}
+      <div
+        className="
+          md:ml-72
+          h-screen
+          overflow-y-auto
+        "
+      >
 
-      <div className="flex-1 min-h-screen">
-
-        {/* Top Header */}
-
+        {/* Header */}
         <header
           className="
-          bg-white
-          border-b
-          shadow-sm
-          px-4
-          md:px-8
-          py-4
-          flex
-          items-center
-          justify-between
-          sticky
-          top-0
-          z-40
+            bg-white
+            border-b
+            shadow-sm
+            px-4
+            md:px-8
+            py-4
+            flex
+            items-center
+            justify-between
+            sticky
+            top-0
+            z-40
           "
         >
           <div className="flex items-center gap-3">
@@ -124,7 +141,6 @@ export default function AdminLayout({
             </button>
 
             <div>
-
               <h1 className="font-bold text-lg md:text-xl">
                 School Management System
               </h1>
@@ -132,38 +148,35 @@ export default function AdminLayout({
               <p className="text-sm text-slate-500">
                 Admin Dashboard
               </p>
-
             </div>
 
           </div>
 
           <div
             className="
-            hidden
-            md:flex
-            items-center
-            gap-3
-            
+              hidden
+              md:flex
+              items-center
+              gap-3
             "
           >
             <div
               className="
-              h-10
-              w-10
-              rounded-full
-              bg-yellow-400
-              text-black
-              flex
-              items-center
-              justify-center
-              font-bold
+                h-10
+                w-10
+                rounded-full
+                bg-yellow-400
+                text-black
+                flex
+                items-center
+                justify-center
+                font-bold
               "
             >
               A
             </div>
 
             <div>
-
               <p className="font-medium">
                 Administrator
               </p>
@@ -171,15 +184,12 @@ export default function AdminLayout({
               <p className="text-sm text-slate-500">
                 {userEmail}
               </p>
-
             </div>
 
           </div>
-
         </header>
 
-        {/* Page Content */}
-
+        {/* Main Content */}
         <main className="p-4 md:p-8">
           {children}
         </main>

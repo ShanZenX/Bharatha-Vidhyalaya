@@ -30,11 +30,7 @@ export default function CustomNavbar() {
 
     window.addEventListener("scroll", handleScroll);
 
-    return () =>
-      window.removeEventListener(
-        "scroll",
-        handleScroll
-      );
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   return (
@@ -48,31 +44,26 @@ export default function CustomNavbar() {
       <Container>
         <Navbar.Brand href="/">
           <div className="d-flex align-items-center gap-2">
-            <div >
-  <img
-            src="/logo.png"
-            alt="School Logo"
-            className="w-14 h-14 object-contain"
-          />            </div>
+            <div>
+              <img
+                src="/logo.png"
+                alt="School Logo"
+                className="w-14 h-14 object-contain"
+              />{" "}
+            </div>
 
             <div>
-              <h5 className="mb-0 fw-bold md:flex hidden text-yellow-100!">
-                Bharatha Vidhyalaya Matriculation School
-              </h5>
-
-  
+              <p className="mb-0 text-lge fw-bold md:flex hidden text-yellow-200!">
+                Bharatha Vidyalaya Matriculation Higher Secondary School
+              </p>
             </div>
           </div>
         </Navbar.Brand>
 
-        <Navbar.Toggle
-          aria-controls="navbar-nav"
-          className="bg-white"
-        />
+        <Navbar.Toggle aria-controls="navbar-nav" className="bg-white" />
 
         <Navbar.Collapse id="navbar-nav">
           <Nav className="ms-auto align-items-center gap-lg-3">
-
             <Nav.Link href="/" className="nav-link-custom">
               Home
             </Nav.Link>
@@ -88,14 +79,17 @@ export default function CustomNavbar() {
             <Nav.Link href="/admissions" className="nav-link-custom">
               Admissions
             </Nav.Link>
+            <Nav.Link href="/toppers" className="nav-link-custom">
+              Toppers
+            </Nav.Link>
 
             <Nav.Link href="/contact" className="nav-link-custom">
               Contact
             </Nav.Link>
 
             <Button
-  href="/admissions"
-  className="
+              href="/admissions"
+              className="
     ms-lg-3
     bg-gradient-to-r
     from-yellow-400
@@ -108,9 +102,9 @@ export default function CustomNavbar() {
     rounded-pill
     shadow-lg
   "
->
-  🎓 Apply Now
-</Button>
+            >
+              🎓 Apply Now
+            </Button>
           </Nav>
         </Navbar.Collapse>
       </Container>

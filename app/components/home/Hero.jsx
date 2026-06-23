@@ -35,34 +35,33 @@ export default function Hero() {
           transition={{ duration: 1 }}
           className="font-heading font-extrabold text-5xl md:text-9xl  leading-tight max-w-6xl"
         >
-         <p
-className="
+        <p
+  className="
     font-heading
     mt-0
     md:pt-6
     md:pb-6
-    md:mx-20
     text-5xl
-    md:text-7xl
+    md:text-8xl
     font-black
     leading-tight
-
-    bg-gradient-to-r
+    bg-gradient-to-b
     from-white
-    via-yellow-200
-    to-yellow-400
-
+    via-white
+    to-yellow-900
     bg-clip-text
     text-transparent
-
-    drop-shadow-[0_6px_30px_rgba(0,0,0,0.6)]
   "
+  // style={{
+  //   textShadow:
+  //     "0 8px 15px rgba(0,0,0,0.35)",
+  // }}
 >
-  Putting your child's Future in great motion
+  Bharatha Vidyalaya
 </p>
           <p className="font-heading text-2xl md:text-3xl font-bold">
             {" "}
-           Bharatha Vidhyalaya Matriculation Higher Secondary School{" "}
+           Matriculation Higher Secondary School{" "}
           </p>
         </motion.h1>
 

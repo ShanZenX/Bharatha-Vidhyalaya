@@ -37,7 +37,7 @@ export default function Footer() {
                     text-transparent
                   "
                 >
-                  Bharatha Vidhyalaya
+                  Bharatha Vidyalaya
                 </span>
 
                 <p className="text-lg text-yellow-300">
@@ -48,7 +48,7 @@ export default function Footer() {
 
             <div className="mt-6 space-y-3 text-white/95">
               <p>
-                📍 Bharatha Vidhyalaya Matriculation Higher Secondary School
+                📍 Bharatha Vidyalaya Matriculation Higher Secondary School
               </p>
 
               <p>
@@ -85,7 +85,7 @@ export default function Footer() {
         <div className="border-t border-yellow-400/30 mt-8 pt-5 text-center">
 
           <p className="text-slate-100 text-sm">
-            © {new Date().getFullYear()} Bharatha Vidhyalaya
+            © {new Date().getFullYear()} Bharatha Vidyalaya
             Matriculation Higher Secondary School.
             All Rights Reserved.
           </p>

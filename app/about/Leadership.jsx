@@ -6,18 +6,35 @@ const leaders = [
     designation: "Correspondent",
     qualification: "MA., M.Ed., BL",
     image: "/leadership/correspondent.jpg",
+    message: `Education is the foundation for a successful future. Our aim is to provide quality education along with discipline, values, creativity, and confidence in every student.
+
+We believe that every child has unique talents and abilities. With the support of dedicated teachers, modern learning methods, and a positive environment, we strive to help our students achieve excellence in academics and life.
+
+Together with parents and teachers, we will continue to build responsible, knowledgeable, and successful young minds.`,
   },
   {
     name: "Mrs. B. Vijayalakshmi",
     designation: "Principal",
     qualification: "MA., B.Ed",
     image: "/leadership/principal.jpg",
+    message: `Education is not just about gaining knowledge; it is about developing character, values, creativity, and confidence. Our school is committed to providing a safe, inspiring, and supportive learning environment for every student.
+
+With the dedication of our teachers, cooperation of parents, and hard work of our students, we aim to achieve excellence in academics and all areas of life.
+
+We encourage our students to dream big, learn continuously, and become responsible citizens of tomorrow.`,
   },
   {
     name: "Mr. M. G. Ramesh",
     designation: "Administrator",
     qualification: "MA., B.Ed., D.T.Ed",
     image: "/leadership/admin.jpg",
+    message: `Today a Reader, Tomorrow a Leader.
+
+Our school is dedicated to creating a strong foundation for students through quality education, discipline, and value-based learning. We believe that a positive educational environment helps every child discover their potential and achieve success.
+
+With the combined efforts of management, teachers, parents, and students, we continue to provide excellent facilities and opportunities for holistic development.
+
+Our commitment is to nurture young minds and prepare them to face the future with confidence and responsibility.`,
   },
 ];
 
@@ -53,6 +70,7 @@ export default function Leadership() {
                 transition-all
                 duration-300
                 border
+                text-center
                 border-yellow-900!
               ">
               <div className="relative w-40 h-40 mx-auto mb-6">
@@ -90,6 +108,9 @@ export default function Leadership() {
               <p className="mt-2 text-gray-600">
                 {leader.qualification}
               </p>
+             <p className="text-gray-600 text-center text-sm leading-relaxed text-left">
+    {leader.message}
+  </p>
             </div>
           ))}
 
