@@ -18,7 +18,7 @@ export default function AboutHero() {
             mb-2
           "
         >
-          About Bharatha Vidhyalaya
+          About Bharatha Vidyalaya
         </span>
 
         <p className="max-w-3xl mx-auto pt-4 text-lg text-gray-600">

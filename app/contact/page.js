@@ -80,7 +80,7 @@ export default function ContactPage() {
             </h3>
 
             <p className="text-gray-600">
-              Bharatha Vidhyalaya Matriculation
+              Bharatha Vidyalaya Matriculation
               Higher Secondary School
             </p>
 
@@ -110,7 +110,7 @@ export default function ContactPage() {
             </h3>
 
             <p className="text-gray-600">
-              +91 98765 43210
+              +91 99407 78545
             </p>
 
             <p className="text-gray-600 mt-2">
