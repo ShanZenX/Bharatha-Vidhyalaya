@@ -85,7 +85,7 @@ export default function ContactPage() {
             </p>
 
             <p className="text-gray-600 mt-2">
-              Chennai, Tamil Nadu, India
+              Thandalam, Tiruporur - Chengalpattu
             </p>
           </div>
 

@@ -4,436 +4,592 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function AdminToppersPage() {
-const [loading, setLoading] =
-useState(false);
+  const [loading, setLoading] = useState(false);
+  const [toppers, setToppers] = useState([]);
+  const [editingId, setEditingId] = useState(null);
 
-const [toppers, setToppers] =
-useState([]);
+  const [form, setForm] = useState({
+    student_name: "",
+    class_name: "",
+    rank: 1,
+    percentage: "",
+    academic_year: "",
+  });
 
-const [editingId, setEditingId] =
-useState(null);
+  const [photo, setPhoto] = useState(null);
 
-const [form, setForm] = useState({
-student_name: "",
-class_name: "",
-rank: 1,
-percentage: "",
-academic_year: "",
-});
+  // Classes
+  const classes = [
+    "LKG",
+    "UKG",
+    "Class 1",
+    "Class 2",
+    "Class 3",
+    "Class 4",
+    "Class 5",
+    "Class 6",
+    "Class 7",
+    "Class 8",
+    "Class 9",
+    "Class 10",
+    "Class 11",
+    "Class 12",
+  ];
 
-const [photo, setPhoto] =
-useState(null);
+  // Fetch toppers
+  useEffect(() => {
+    fetchToppers();
+  }, []);
 
-useEffect(() => {
-fetchToppers();
-}, []);
-
-async function fetchToppers() {
-const { data } = await supabase
-.from("toppers")
-.select("*")
-.order("class_name")
-.order("rank");
-
-
-setToppers(data || []);
-
-
-}
-
-const getImageUrl = (path) => {
-const { data } = supabase.storage
-.from("toppers")
-.getPublicUrl(path);
-
-
-return data.publicUrl;
-
-
-};
-
-async function handleSubmit(e) {
-e.preventDefault();
-
-
-setLoading(true);
-
-let photoPath = null;
-
-if (photo) {
-const fileExt = photo.name.split(".").pop();
-
-const fileName =
-  `${Date.now()}-${Math.random()
-    .toString(36)
-    .substring(2)}.${fileExt}`;
-    
-  const { error: uploadError } =
-    await supabase.storage
+  async function fetchToppers() {
+    const { data, error } = await supabase
       .from("toppers")
-      .upload(fileName, photo);
+      .select("*")
+      .order("class_name")
+      .order("rank");
 
-  if (uploadError) {
-    alert(uploadError.message);
-    setLoading(false);
-    return;
+    if (error) {
+      console.error("Error fetching toppers:", error);
+      return;
+    }
+
+    setToppers(data || []);
   }
 
-  photoPath = fileName;
-}
+  // Get image URL
+  const getImageUrl = (path) => {
+    if (!path) {
+      return "/default-student.jpg";
+    }
 
-if (editingId) {
-  const updateData = {
-    ...form,
+    const { data } = supabase.storage
+      .from("toppers")
+      .getPublicUrl(path);
+
+    return data.publicUrl;
   };
 
-  if (photoPath) {
-    updateData.photo_path =
-      photoPath;
+  // Handle form input
+  function handleChange(e) {
+    const { name, value } = e.target;
+
+    setForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   }
 
-  const { error } = await supabase
-    .from("toppers")
-    .update(updateData)
-    .eq("id", editingId);
+  // Submit form
+  async function handleSubmit(e) {
+    e.preventDefault();
 
-  if (error) {
-console.log(error);
-alert(JSON.stringify(error));  }
-} else {
-  const { error } = await supabase
-    .from("toppers")
-    .insert([
-      {
-        ...form,
-        photo_path: photoPath,
-      },
-    ]);
+    setLoading(true);
 
-  if (error) {
-    alert(error.message);
+    let photoPath = null;
+
+    // Upload photo
+    if (photo) {
+      const fileExt = photo.name.split(".").pop();
+
+      const fileName = `${Date.now()}-${Math.random()
+        .toString(36)
+        .substring(2)}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("toppers")
+        .upload(fileName, photo);
+
+      if (uploadError) {
+        console.error(uploadError);
+        alert(uploadError.message);
+        setLoading(false);
+        return;
+      }
+
+      photoPath = fileName;
+    }
+
+    // UPDATE
+    if (editingId) {
+      const updateData = {
+        student_name: form.student_name,
+        class_name: form.class_name,
+        rank: Number(form.rank),
+        percentage: form.percentage,
+        academic_year: form.academic_year,
+      };
+
+      // Only update photo if a new photo is selected
+      if (photoPath) {
+        updateData.photo_path = photoPath;
+      }
+
+      const { error } = await supabase
+        .from("toppers")
+        .update(updateData)
+        .eq("id", editingId);
+
+      if (error) {
+        console.error(error);
+        alert(error.message);
+        setLoading(false);
+        return;
+      }
+
+      alert("Topper updated successfully!");
+    }
+
+    // INSERT
+    else {
+      const { error } = await supabase
+        .from("toppers")
+        .insert([
+          {
+            student_name: form.student_name,
+            class_name: form.class_name,
+            rank: Number(form.rank),
+            percentage: form.percentage,
+            academic_year: form.academic_year,
+            photo_path: photoPath,
+          },
+        ]);
+
+      if (error) {
+        console.error(error);
+        alert(error.message);
+        setLoading(false);
+        return;
+      }
+
+      alert("Topper added successfully!");
+    }
+
+    // Reset form
+    setForm({
+      student_name: "",
+      class_name: "",
+      rank: 1,
+      percentage: "",
+      academic_year: "",
+    });
+
+    setPhoto(null);
+    setEditingId(null);
+
+    // Reset file input
+    const fileInput = document.getElementById("topper-photo");
+
+    if (fileInput) {
+      fileInput.value = "";
+    }
+
+    await fetchToppers();
+
+    setLoading(false);
   }
-}
 
-setForm({
-  student_name: "",
-  class_name: "",
-  rank: 1,
-  percentage: "",
-  academic_year: "",
-});
+  // Delete topper
+  async function deleteTopper(id) {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this topper?"
+    );
 
-setPhoto(null);
-setEditingId(null);
+    if (!confirmDelete) {
+      return;
+    }
 
-fetchToppers();
+    const { error } = await supabase
+      .from("toppers")
+      .delete()
+      .eq("id", id);
 
-setLoading(false);
-```
+    if (error) {
+      console.error(error);
+      alert(error.message);
+      return;
+    }
 
-}
+    alert("Topper deleted successfully!");
 
-async function deleteTopper(id) {
-const confirmDelete =
-window.confirm(
-"Delete this topper?"
-);
+    fetchToppers();
+  }
 
-```
-if (!confirmDelete) return;
+  // Edit topper
+  function editTopper(topper) {
+    setEditingId(topper.id);
 
-await supabase
-  .from("toppers")
-  .delete()
-  .eq("id", id);
+    setForm({
+      student_name: topper.student_name || "",
+      class_name: topper.class_name || "",
+      rank: topper.rank || 1,
+      percentage: topper.percentage || "",
+      academic_year: topper.academic_year || "",
+    });
 
-fetchToppers();
-```
+    setPhoto(null);
 
-}
+    const fileInput = document.getElementById("topper-photo");
 
-function editTopper(topper) {
-setEditingId(topper.id);
+    if (fileInput) {
+      fileInput.value = "";
+    }
 
-```
-setForm({
-  student_name:
-    topper.student_name,
-  class_name:
-    topper.class_name,
-  rank: topper.rank,
-  percentage:
-    topper.percentage,
-  academic_year:
-    topper.academic_year,
-});
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  }
 
-window.scrollTo({
-  top: 0,
-  behavior: "smooth",
-});
+  // Cancel edit
+  function cancelEdit() {
+    setEditingId(null);
 
+    setForm({
+      student_name: "",
+      class_name: "",
+      rank: 1,
+      percentage: "",
+      academic_year: "",
+    });
 
-}
+    setPhoto(null);
 
-return ( <div className="space-y-10">
+    const fileInput = document.getElementById("topper-photo");
 
-  <div className="bg-white rounded-3xl p-8 shadow-lg">
+    if (fileInput) {
+      fileInput.value = "";
+    }
+  }
 
-    <h1 className="text-3xl font-bold mb-6">
-      {editingId
-        ? "Edit Topper"
-        : "Add Topper"}
-    </h1>
+  return (
+    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
 
-    <form
-      onSubmit={handleSubmit}
-      className="grid md:grid-cols-2 gap-4"
-    >
-      <input
-        type="text"
-        placeholder="Student Name"
-        value={form.student_name}
-        onChange={(e) =>
-          setForm({
-            ...form,
-            student_name:
-              e.target.value,
-          })
-        }
-        className="border p-3 rounded-xl"
-        required
-      />
+      {/* Header */}
+      <div className="max-w-7xl mx-auto">
 
-      <select
-        value={form.class_name}
-        onChange={(e) =>
-          setForm({
-            ...form,
-            class_name:
-              e.target.value,
-          })
-        }
-        className="border p-3 rounded-xl"
-        required
-      >
-        <option value="">
-          Select Class
-        </option>
+        <div className="mb-8">
+          <span className="inline-block bg-yellow-100 text-yellow-700 px-4 py-2 rounded-full text-sm font-semibold mb-3">
+            Academic Excellence
+          </span>
 
-        {[...Array(10)].map(
-          (_, i) => (
-            <option
-              key={i}
-              value={`Class ${
-                i + 1
-              }`}
-            >
-              Class {i + 1}
-            </option>
-          )
-        )}
-      </select>
+          <h1 className="text-3xl md:text-4xl font-black text-gray-900">
+            {editingId ? "Edit Topper" : "Add Topper"}
+          </h1>
 
-      <select
-        value={form.rank}
-        onChange={(e) =>
-          setForm({
-            ...form,
-            rank:
-              Number(
-                e.target.value
-              ),
-          })
-        }
-        className="border p-3 rounded-xl"
-      >
-        <option value="1">
-          🥇 Rank 1
-        </option>
+          <p className="text-gray-500 mt-2">
+            Manage school toppers and their academic achievements.
+          </p>
+        </div>
 
-        <option value="2">
-          🥈 Rank 2
-        </option>
+        {/* Form */}
+        <div className="bg-white rounded-3xl shadow-lg p-5 md:p-8 mb-12">
 
-        <option value="3">
-          🥉 Rank 3
-        </option>
-      </select>
+          <form
+            onSubmit={handleSubmit}
+            className="grid md:grid-cols-2 gap-5"
+          >
 
-      <input
-        type="text"
-        placeholder="Percentage"
-        value={form.percentage}
-        onChange={(e) =>
-          setForm({
-            ...form,
-            percentage:
-              e.target.value,
-          })
-        }
-        className="border p-3 rounded-xl"
-        required
-      />
+            {/* Student Name */}
+            <div>
+              <label className="block font-semibold text-gray-700 mb-2">
+                Student Name
+              </label>
 
-      <input
-        type="text"
-        placeholder="Academic Year"
-        value={form.academic_year}
-        onChange={(e) =>
-          setForm({
-            ...form,
-            academic_year:
-              e.target.value,
-          })
-        }
-        className="border p-3 rounded-xl"
-        required
-      />
+              <input
+                type="text"
+                name="student_name"
+                placeholder="Enter student name"
+                value={form.student_name}
+                onChange={handleChange}
+                className="w-full border border-gray-200 p-3 rounded-xl outline-none focus:border-yellow-500 focus:ring-2 focus:ring-yellow-100"
+                required
+              />
+            </div>
 
-      <input
-        type="file"
-        accept="image/*"
-        onChange={(e) =>
-          setPhoto(
-            e.target.files[0]
-          )
-        }
-        className="border p-3 rounded-xl"
-      />
+            {/* Class */}
+            <div>
+              <label className="block font-semibold text-gray-700 mb-2">
+                Class
+              </label>
 
-      <button
-        type="submit"
-        disabled={loading}
-        className="
-          md:col-span-2
-          bg-yellow-500
-          text-white
-          py-3
-          rounded-xl
-          font-bold
-        "
-      >
-        {loading
-          ? "Saving..."
-          : editingId
-          ? "Update Topper"
-          : "Add Topper"}
-      </button>
-    </form>
-  </div>
+              <select
+                name="class_name"
+                value={form.class_name}
+                onChange={handleChange}
+                className="w-full border border-gray-200 p-3 rounded-xl outline-none focus:border-yellow-500 focus:ring-2 focus:ring-yellow-100"
+                required
+              >
+                <option value="">
+                  Select Class
+                </option>
 
-  <div>
+                {classes.map((cls) => (
+                  <option key={cls} value={cls}>
+                    {cls}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-    <h2 className="text-2xl font-bold mb-6">
-      Uploaded Toppers
-    </h2>
+            {/* Rank */}
+            <div>
+              <label className="block font-semibold text-gray-700 mb-2">
+                Rank
+              </label>
 
-    <div className="grid md:grid-cols-3 gap-6">
+              <select
+                name="rank"
+                value={form.rank}
+                onChange={handleChange}
+                className="w-full border border-gray-200 p-3 rounded-xl outline-none focus:border-yellow-500 focus:ring-2 focus:ring-yellow-100"
+              >
+                <option value={1}>
+                  🥇 Rank 1
+                </option>
 
-      {toppers.map((topper) => (
-        <div
-          key={topper.id}
-          className="
-            bg-white
-            rounded-3xl
-            overflow-hidden
-            shadow-lg
-          "
-        >
-          <img
-            src={getImageUrl(
-              topper.photo_path
-            )}
-            alt={
-              topper.student_name
-            }
-            className="
-              w-full
-              h-72
-              object-cover
-            "
-          />
+                <option value={2}>
+                  🥈 Rank 2
+                </option>
 
-          <div className="p-5">
+                <option value={3}>
+                  🥉 Rank 3
+                </option>
+              </select>
+            </div>
 
-            <h3 className="font-bold text-xl">
-              {
-                topper.student_name
-              }
-            </h3>
+            {/* Percentage */}
+            <div>
+              <label className="block font-semibold text-gray-700 mb-2">
+                Percentage
+              </label>
 
-            <p>
-              {
-                topper.class_name
-              }
-            </p>
+              <input
+                type="text"
+                name="percentage"
+                placeholder="Example: 98.5%"
+                value={form.percentage}
+                onChange={handleChange}
+                className="w-full border border-gray-200 p-3 rounded-xl outline-none focus:border-yellow-500 focus:ring-2 focus:ring-yellow-100"
+                required
+              />
+            </div>
 
-            <p>
-              Rank #
-              {topper.rank}
-            </p>
+            {/* Academic Year */}
+            <div>
+              <label className="block font-semibold text-gray-700 mb-2">
+                Academic Year
+              </label>
 
-            <p>
-              {
-                topper.percentage
-              }
-            </p>
+              <input
+                type="text"
+                name="academic_year"
+                placeholder="Example: 2025-2026"
+                value={form.academic_year}
+                onChange={handleChange}
+                className="w-full border border-gray-200 p-3 rounded-xl outline-none focus:border-yellow-500 focus:ring-2 focus:ring-yellow-100"
+                required
+              />
+            </div>
 
-            <p>
-              {
-                topper.academic_year
-              }
-            </p>
+            {/* Photo */}
+            <div>
+              <label className="block font-semibold text-gray-700 mb-2">
+                Student Photo
+              </label>
 
-            <div className="flex gap-3 mt-4">
+              <input
+                id="topper-photo"
+                type="file"
+                accept="image/*"
+                onChange={(e) =>
+                  setPhoto(e.target.files?.[0] || null)
+                }
+                className="w-full border border-gray-200 p-3 rounded-xl bg-white"
+              />
+
+              {editingId && (
+                <p className="text-xs text-gray-500 mt-2">
+                  Leave empty to keep the existing photo.
+                </p>
+              )}
+            </div>
+
+            {/* Buttons */}
+            <div className="md:col-span-2 flex flex-col md:flex-row gap-3 mt-2">
 
               <button
-                onClick={() =>
-                  editTopper(
-                    topper
-                  )
-                }
-                className="
-                  flex-1
-                  bg-blue-600
-                  text-white
-                  py-2
-                  rounded-lg
-                "
+                type="submit"
+                disabled={loading}
+                className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white py-3 rounded-xl font-bold transition disabled:opacity-50"
               >
-                Edit
+                {loading
+                  ? "Saving..."
+                  : editingId
+                  ? "Update Topper"
+                  : "Add Topper"}
               </button>
 
-              <button
-                onClick={() =>
-                  deleteTopper(
-                    topper.id
-                  )
-                }
-                className="
-                  flex-1
-                  bg-red-600
-                  text-white
-                  py-2
-                  rounded-lg
-                "
-              >
-                Delete
-              </button>
+              {editingId && (
+                <button
+                  type="button"
+                  onClick={cancelEdit}
+                  className="md:w-40 bg-gray-200 hover:bg-gray-300 text-gray-800 py-3 rounded-xl font-bold transition"
+                >
+                  Cancel
+                </button>
+              )}
 
             </div>
 
-          </div>
+          </form>
         </div>
-      ))}
 
+        {/* Uploaded Toppers */}
+        <div className="mb-6">
+          <h2 className="text-2xl md:text-3xl font-black text-gray-900">
+            Uploaded Toppers
+          </h2>
+
+          <p className="text-gray-500 mt-1">
+            {toppers.length} topper
+            {toppers.length !== 1 ? "s" : ""} uploaded
+          </p>
+        </div>
+
+        {/* Empty State */}
+        {toppers.length === 0 && (
+          <div className="bg-white rounded-3xl shadow p-10 text-center">
+            <div className="text-5xl mb-4">
+              🏆
+            </div>
+
+            <h3 className="text-xl font-bold text-gray-800">
+              No toppers yet
+            </h3>
+
+            <p className="text-gray-500 mt-2">
+              Add your first topper using the form above.
+            </p>
+          </div>
+        )}
+
+        {/* Toppers Grid */}
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+
+          {toppers.map((topper) => (
+            <div
+              key={topper.id}
+              className="bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300"
+            >
+
+              {/* Image */}
+              <div className="relative">
+
+                <img
+                  src={getImageUrl(topper.photo_path)}
+                  alt={topper.student_name}
+                  className="w-full h-64 object-cover"
+                />
+
+                {/* Rank */}
+                <div className="absolute top-3 right-3 bg-yellow-500 text-white text-sm font-bold px-3 py-1.5 rounded-full shadow">
+                  Rank #{topper.rank}
+                </div>
+
+              </div>
+
+              {/* Content */}
+              <div className="p-5">
+
+                <div className="flex items-center justify-between mb-3">
+
+                  <h3 className="font-bold text-xl text-gray-900">
+                    {topper.student_name}
+                  </h3>
+
+                  <span className="text-2xl">
+                    {topper.rank === 1
+                      ? "🥇"
+                      : topper.rank === 2
+                      ? "🥈"
+                      : "🥉"}
+                  </span>
+
+                </div>
+
+                <div className="space-y-2 text-sm">
+
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">
+                      Class
+                    </span>
+
+                    <span className="font-semibold text-gray-800">
+                      {topper.class_name}
+                    </span>
+                  </div>
+
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">
+                      Rank
+                    </span>
+
+                    <span className="font-semibold text-gray-800">
+                      #{topper.rank}
+                    </span>
+                  </div>
+
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">
+                      Percentage
+                    </span>
+
+                    <span className="font-semibold text-yellow-700">
+                      {topper.percentage}
+                    </span>
+                  </div>
+
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">
+                      Academic Year
+                    </span>
+
+                    <span className="font-semibold text-gray-800">
+                      {topper.academic_year}
+                    </span>
+                  </div>
+
+                </div>
+
+                {/* Buttons */}
+                <div className="flex gap-3 mt-5">
+
+                  <button
+                    type="button"
+                    onClick={() => editTopper(topper)}
+                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-xl font-semibold transition"
+                  >
+                    Edit
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => deleteTopper(topper.id)}
+                    className="flex-1 bg-red-600 hover:bg-red-700 text-white py-2.5 rounded-xl font-semibold transition"
+                  >
+                    Delete
+                  </button>
+
+                </div>
+
+              </div>
+
+            </div>
+          ))}
+
+        </div>
+
+      </div>
     </div>
-
-  </div>
-
-</div>
-
-
-);
+  );
 }
